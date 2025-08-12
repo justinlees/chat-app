@@ -72,24 +72,25 @@ const getMessages = async (req, res) => {
 const sendMessage = async (req, res) => {
   const { senderId, receiverId, text, image } = req.body;
   try {
-    const userMessages = await Message.create({
+    const newMessage = await Message.create({
       senderId,
       receiverId,
       text,
       image,
     });
-    if (!userMessages) {
+    if (!newMessage) {
       return res.status(500).json({ message: "Failed to send message" });
     }
 
     console.log("Message sent successfully");
 
     const io = req.app.get("io");
-    io.emit("receiveMessage", userMessages);
+    io.to(receiverId).emit("receiveMessage", newMessage);
+    io.to(senderId).emit("receiveMessage", newMessage);
 
     return res
       .status(201)
-      .json({ message: "Message sent successfully", userMessages });
+      .json({ message: "Message sent successfully", newMessage });
   } catch (error) {
     console.error("Error in sending message:", error);
     return res.status(500).json({ message: "Internal server error" });

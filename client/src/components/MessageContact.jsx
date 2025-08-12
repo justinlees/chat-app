@@ -53,6 +53,8 @@ const MessageContact = () => {
     };
     fetchUserDetails();
 
+    socket.emit("join", senderId);
+
     socket.on("receiveMessage", (messageData) => {
       setUserMessages((prev) => [...prev, messageData]);
     });

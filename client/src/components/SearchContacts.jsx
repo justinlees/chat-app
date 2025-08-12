@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import UserInfoPopUp from "./UserInfoPopUp.jsx";
-import { Link, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 
-const SearchContacts = ({ user }) => {
+const SearchContacts = ({ user, userContacts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [receiver, setReceiver] = useState();
-  const [showContact, setShowContact] = useState(false);
+  // const [showContact, setShowContact] = useState(false);
 
   const [userPopUp, setUserPopUp] = useState(false);
   const handleClick = () => {
@@ -22,15 +22,13 @@ const SearchContacts = ({ user }) => {
             method: "GET",
             headers: { "Content-Type": "application/json" },
           }
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.receiver) {
-              setReceiver(data.receiver);
-            } else if (!data.receiver) {
-              console.log("No contacts found");
-            }
-          });
+        );
+        const data = await response.json();
+        if (data.receiver) {
+          setReceiver(data.receiver);
+        } else if (!data.receiver) {
+          console.log("No contacts found");
+        }
       } catch (error) {
         console.error("Error fetching contacts:", error);
         setReceiver();
@@ -41,7 +39,7 @@ const SearchContacts = ({ user }) => {
   }, [searchTerm, user._id]);
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full h-full">
       <div className="flex flex-col w-1/4">
         <div className="bg-gray-900 flex items-center justify-between p-2">
           <h1 className="text-lg text-white">{user.name}</h1>
@@ -63,9 +61,6 @@ const SearchContacts = ({ user }) => {
           {receiver ? (
             <Link
               className="mt-2 p-2 rounded hover:bg-gray-500 cursor-pointer filter-blur"
-              onClick={(e) => {
-                setShowContact(!showContact);
-              }}
               to={`${receiver._id}`}
             >
               {receiver.name}
@@ -73,6 +68,21 @@ const SearchContacts = ({ user }) => {
           ) : searchTerm ? (
             <p>No contacts found</p>
           ) : null}
+          <div className="flex flex-col gap-2 mt-2 overflow-y-auto">
+            {userContacts?.map((contact) => (
+              <NavLink
+                to={`${contact._id}`}
+                key={contact._id}
+                className={({ isActive }) =>
+                  isActive
+                    ? "p-2 hover:bg-gray-500 bg-gray-600 rounded"
+                    : "p-2 hover:bg-gray-500 rounded"
+                }
+              >
+                {contact.name}
+              </NavLink>
+            ))}
+          </div>
         </div>
       </div>
 

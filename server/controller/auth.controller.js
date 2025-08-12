@@ -32,6 +32,7 @@ const signUp = async (req, res) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
+      console.log("SignUp successful");
       return res
         .status(201)
         .json({ message: "User created successfully", user, token });
@@ -44,9 +45,10 @@ const signUp = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  console.log("Login Request");
   try {
     const { email, password } = req.body;
-    if (!email && !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
     const user = await User.findOne({ email });
@@ -60,6 +62,7 @@ const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+    console.log("Login successful");
     return res.status(200).json({ message: "Login success", user, token });
   } catch (error) {
     console.error("Error in login:", error);

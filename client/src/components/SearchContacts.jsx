@@ -40,9 +40,10 @@ const SearchContacts = ({ user, userContacts }) => {
 
   return (
     <div className="flex w-full h-full">
-      <div className="flex flex-col w-1/4">
-        <div className="bg-gray-900 flex items-center justify-between p-2">
-          <h1 className="text-lg text-white">{user.name}</h1>
+      {/* SideBar */}
+      <div className="flex flex-col w-1/4 min-w-60 h-full bg-gray-900">
+        <div className="bg-gray-800 flex items-center justify-between p-4 h-14">
+          <h1 className="text-xl text-white">{user.name}</h1>
           <h1
             className="text-lg text-white hover:cursor-pointer"
             onClick={handleClick}
@@ -50,23 +51,23 @@ const SearchContacts = ({ user, userContacts }) => {
             ...
           </h1>
         </div>
-        <div className="flex flex-col justify-center p-4 text-white">
+        <div className="flex flex-col p-4 gap-2 text-white h-full">
           <input
             type="search"
             name="contacts"
             placeholder="Search"
-            className="border border-gray-300 rounded p-2 text-gray-100 w-full mb-2"
+            className="border border-gray-700 rounded-xl p-2 text-white font-bold w-full bg-gray-800"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {receiver ? (
             <Link
-              className="mt-2 p-2 rounded hover:bg-gray-500 cursor-pointer filter-blur"
+              className="p-2 rounded hover:bg-gray-800 cursor-pointer filter-blur"
               to={`${receiver._id}`}
             >
               {receiver.name}
             </Link>
           ) : searchTerm ? (
-            <p>No contacts found</p>
+            <p className="p-2">No contacts found</p>
           ) : null}
           <div className="flex flex-col gap-2 mt-2 overflow-y-auto">
             {userContacts?.map((contact) => (
@@ -75,8 +76,8 @@ const SearchContacts = ({ user, userContacts }) => {
                 key={contact._id}
                 className={({ isActive }) =>
                   isActive
-                    ? "p-2 hover:bg-gray-500 bg-gray-600 rounded"
-                    : "p-2 hover:bg-gray-500 rounded"
+                    ? "p-2 flex hover:bg-gray-600 bg-gray-800 text-lg rounded transition-colors"
+                    : "p-2 flex hover:bg-gray-600 text-lg rounded transition-colors"
                 }
               >
                 {contact.name}
@@ -84,16 +85,16 @@ const SearchContacts = ({ user, userContacts }) => {
             ))}
           </div>
         </div>
+        {userPopUp && (
+          <UserInfoPopUp
+            user={user}
+            isOpen={userPopUp}
+            onClose={() => setUserPopUp(false)}
+          />
+        )}
       </div>
 
-      {userPopUp && (
-        <UserInfoPopUp
-          user={user}
-          isOpen={userPopUp}
-          onClose={() => setUserPopUp(false)}
-        />
-      )}
-      <div className="message-container w-full h-full">
+      <div className="message-container flex w-full h-full bg-gray-100 relative">
         <Outlet />
       </div>
     </div>

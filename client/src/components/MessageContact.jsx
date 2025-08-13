@@ -98,25 +98,27 @@ const MessageContact = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="bg-gray-900 flex items-center justify-between p-2">
-        <h1 className=" text-lg text-gray-200">{receiver?.name}</h1>
+    <div className="flex flex-col w-full h-full">
+      {/* ReceiverBar */}
+      <div className="flex items-center justify-between h-14 p-4 bg-gray-800">
+        <h1 className=" text-lg text-white">{receiver?.name}</h1>
         <h1
-          className="text-lg text-gray-200 hover:cursor-pointer"
+          className="text-lg text-white hover:cursor-pointer"
           onClick={handleClick}
         >
           ...
         </h1>
       </div>
-      <div className="w-full h-full bg-gray-200 p-2 gap-4 flex flex-col overflow-y-scroll">
+
+      {/* Chat Container */}
+      <div className="flex flex-col w-full h-full overflow-y-scroll p-2 gap-2">
         {userMessages?.map((msg) =>
           msg.senderId === senderId ? (
-            <div
-              className="max-w-lg min-w-24 flex flex-col bg-gray-800 text-gray-200 rounded-lg ml-auto p-1 flex-wrap"
-              key={msg._id}
-            >
-              <h1 className="p-1 text-md mr-auto">{msg.text}</h1>
-              <span className="text-xs text-gray-200 ml-auto">
+            <div className="max-w-2xl  flex flex-col ml-auto p-1" key={msg._id}>
+              <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-900 text-gray-200 rounded-2xl break-all whitespace-pre-wrap">
+                {msg.text}
+              </h1>
+              <span className="text-xs text-gray-900 ml-auto">
                 {new Date(msg.createdAt).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -125,12 +127,11 @@ const MessageContact = () => {
               </span>
             </div>
           ) : (
-            <div
-              className="max-w-lg min-w-24 flex flex-col bg-gray-400 text-gray-900 rounded-lg mr-auto p-1 flex-wrap"
-              key={msg._id}
-            >
-              <h1 className="p-1 text-md mr-auto">{msg.text}</h1>
-              <span className="text-xs text-gray-200 ml-auto">
+            <div className="max-w-2xl flex flex-col mr-auto p-1" key={msg._id}>
+              <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-400 text-gray-900 rounded-2xl break-all whitespace-pre-wrap">
+                {msg.text}
+              </h1>
+              <span className="text-xs text-gray-900 mr-auto">
                 {new Date(msg.createdAt).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -142,30 +143,39 @@ const MessageContact = () => {
         )}
         <div ref={messageEnd} />
       </div>
-      <div className="flex w-full h-1/6">
+
+      {/* Input Box */}
+      <div className="flex items-center bg-gray-100 p-3 ">
         <form
           method="POST"
-          className="w-full p-2 bg-gray-100"
+          className="flex items-center w-full h-16 gap-3"
           onSubmit={handleSubmit}
           encType="multipart/form-data"
         >
-          <input
-            type="file"
-            name="image"
-            className="border border-black rounded"
-          />
+          {/* File Upload Button */}
+          <label
+            htmlFor="fileInput"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-600 cursor-pointer hover:bg-gray-300 transition"
+          >
+            +
+            <input type="file" name="image" id="fileInput" className="hidden" />
+          </label>
+
+          {/* Message Input */}
           <input
             type="text"
             required
-            placeholder="send message"
+            placeholder="Type a message..."
             name="text"
-            className="border border-black rounded overflow-wrap"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white shadow-sm"
           />
+
+          {/* Send Button */}
           <button
             type="submit"
-            className="border border-black rounded w-1/16 cursor-pointer hover:bg-blue-400"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
           >
-            Send
+            ➤
           </button>
         </form>
       </div>

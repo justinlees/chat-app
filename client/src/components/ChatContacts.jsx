@@ -28,8 +28,9 @@ const ChatContacts = ({ user }) => {
     };
     fetchContacts();
   }, [user._id]);
+
   return (
-    <div className="bg-gray-800 w-full h-full">
+    <div className="flex w-full h-full">
       <SearchContacts user={user} userContacts={userContacts} />
     </div>
   );

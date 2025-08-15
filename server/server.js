@@ -30,9 +30,9 @@ app.use("/user", userRoute);
 io.on("connection", (socket) => {
   console.log("A user Connected", socket.id);
 
-  socket.on("join", (userId) => {
-    socket.join(userId);
-    console.log(`User ${userId}  joined personal room`);
+  socket.on("join", (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined ${roomId} room`);
   });
 
   socket.on("disconnect", () => {

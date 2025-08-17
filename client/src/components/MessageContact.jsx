@@ -115,7 +115,7 @@ const MessageContact = () => {
       messageEnd.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message");
+      alert(`Failed to send message ${error}`);
       setIsSending(false);
     }
   };
@@ -156,7 +156,18 @@ const MessageContact = () => {
                 className="w-10 h-10 object-cover rounded-full ml-auto"
               />
               <div className="max-w-2xl flex flex-col ml-auto p-1">
-                {msg.image !== "undefined" ? <img src={msg.image} /> : null}
+                {msg.image ? (
+                  msg.image.includes(".pdf") ? (
+                    <object
+                      data={msg.image}
+                      type="application/pdf"
+                      width="100%"
+                      height="400px"
+                    ></object>
+                  ) : (
+                    <img src={msg.image} />
+                  )
+                ) : null}
 
                 {msg.text && (
                   <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-900 text-gray-200 rounded-2xl break-all whitespace-pre-wrap">
@@ -180,7 +191,18 @@ const MessageContact = () => {
                 className="w-10 h-10 object-cover rounded-full"
               />
               <div className="max-w-2xl flex flex-col mr-auto p-1">
-                {msg.image !== "undefined" ? <img src={msg.image} /> : null}
+                {msg.image ? (
+                  msg.image.includes(".pdf") ? (
+                    <object
+                      data={msg.image}
+                      type="application/pdf"
+                      width="100%"
+                      height="400px"
+                    ></object>
+                  ) : (
+                    <img src={msg.image} />
+                  )
+                ) : null}
                 {msg.text && (
                   <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-400 text-gray-900 rounded-2xl break-all whitespace-pre-wrap">
                     {msg.text}
@@ -199,7 +221,7 @@ const MessageContact = () => {
           )
         )}
         {isSending && (
-          <div className="loader w-full h-full absoulte top-1/2 right-1/2"></div>
+          <div className="loader w-full h-full top-1/2 right-1/2"></div>
         )}
         {docPreview && (
           <div className="fixed top-1/2 right-10 transform -translate-y-1/2 bg-white shadow-lg border border-gray-300 rounded-lg w-80 z-50">
@@ -218,11 +240,19 @@ const MessageContact = () => {
               </button>
             </div>
             <div className="p-2">
-              <img
-                src={docPreview}
-                alt="Preview"
-                className="w-full h-auto rounded-md object-contain"
-              />
+              {docPreview.endsWith(".pdf") ? (
+                <object
+                  data={docPreview}
+                  type="application/pdf"
+                  alt="Preview"
+                  className="w-full h-auto rounded-md object-contain"
+                />
+              ) : (
+                <img
+                  src={docPreview}
+                  className="w-full h-auto rounded-md object-contain"
+                />
+              )}
             </div>
           </div>
         )}

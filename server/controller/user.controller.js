@@ -134,7 +134,7 @@ const getMessages = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-  const { senderId, receiverId, text } = req.body;
+  const { senderId, receiverId } = req.body;
   let image = null;
   let imageId = null;
   if (req.file) {
@@ -142,6 +142,14 @@ const sendMessage = async (req, res) => {
     image = file.path;
     imageId = file.filename;
   }
+
+  let text = req.body.text;
+  if (text === "null") text = null;
+
+  console.log("Checking text ");
+  console.log(text);
+  console.log(typeof text);
+  console.log("check finish");
 
   try {
     const newMessage = await Message.create({

@@ -36,5 +36,8 @@ const chatStorage = new CloudinaryStorage({
 });
 
 const profileUpload = multer({ storage: profileStorage });
-const chatUpload = multer({ storage: chatStorage });
+const chatUpload = multer({
+  limits: { fileSize: 15 * 1024 * 1024 },
+  storage: chatStorage,
+});
 module.exports = { profileUpload, chatUpload, cloudinary };

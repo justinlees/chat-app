@@ -33,7 +33,7 @@ const signUp = async (req, res) => {
         expiresIn: "1d",
       });
 
-      res.cookie(`token_${newUser._id}`, token, {
+      res.cookie(`token`, token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Lax",
@@ -69,23 +69,18 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const existingCookie = `token_${UserDetails._id}`;
-    if (req.cookies[existingCookie]) {
-      return res.status(400).json({ message: "User already logged in" });
-    }
+    const user = await User.findOne({ email }).select("-password");
 
     const token = jwt.sign({ id: UserDetails._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
-    res.cookie(`token_${UserDetails._id}`, token, {
+    res.cookie(`token`, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
       maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
     });
-
-    const user = await User.findOne({ email }).select("-password");
 
     console.log("Login successful");
     return res.status(200).json({ message: "Login success", user });
@@ -95,9 +90,22 @@ const login = async (req, res) => {
   }
 };
 
+const loginGet = async (req, res) => {
+  try {
+    const cookieExist = req.cookies.token;
+    const decoded = jwt.verify(cookieExist, process.env.JWT_SECRET);
+    if (cookieExist) {
+      const user = await User.findOne({ _id: decoded.id }).select("-password");
+      return res.status(200).json({ message: "User Token exist", user });
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "No Token" });
+  }
+};
+
 const logout = (req, res) => {
   try {
-    res.clearCookie(`token_${req.senderId}`, {
+    res.clearCookie(`token`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
@@ -108,4 +116,4 @@ const logout = (req, res) => {
   }
 };
 
-module.exports = { signUp, login, logout };
+module.exports = { signUp, login, loginGet, logout };

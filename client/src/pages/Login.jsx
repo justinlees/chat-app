@@ -1,4 +1,28 @@
+import { useEffect } from "react";
+
 const Login = () => {
+  useEffect(() => {
+    const checkToken = async (e) => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.message === "User Token exist") {
+          window.location.href = `/user/${data.user._id}`;
+        }
+      } catch (error) {
+        alert("Server Error");
+      }
+    };
+
+    checkToken();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loginUser = {

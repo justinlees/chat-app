@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
 dotenv.config();
 const app = express();
 
@@ -10,8 +11,10 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
   })
 );
+app.use(cookieParser());
 app.use(express.json({ limit: 15 * 1024 * 1024 }));
 app.use(express.urlencoded({ extended: true, limit: 15 * 1024 * 1024 }));
 const httpServer = createServer(app);

@@ -5,16 +5,16 @@ const Login = () => {
       email: e.target.Email.value,
       password: e.target.Password.value,
     };
-    const response = await fetch("http://localhost:5000/login", {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(loginUser),
+      credentials: "include",
     });
     const data = await response.json();
     if (data.message === "Login success") {
-      localStorage.setItem("token", data.token);
       window.location.href = `/user/${data.user._id}`;
     } else {
       alert(data.message);

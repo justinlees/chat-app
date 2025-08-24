@@ -7,7 +7,7 @@ const SignUp = () => {
   const [mobile, setMobile] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`http://localhost:5000/signUp`, {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signUp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -18,6 +18,7 @@ const SignUp = () => {
         password,
         mobile,
       }),
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {

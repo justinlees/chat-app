@@ -18,24 +18,33 @@ const signUp = async (req, res) => {
       }
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const user = await User.create({
+      const newUser = await User.create({
         name,
         email,
         password: hashedPassword,
         mobile,
       });
 
-      if (!user) {
+      if (!newUser) {
         return res.status(500).json({ message: "User creation failed" });
       }
 
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
+
+      res.cookie(`token_${newUser._id}`, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
+      });
+
       console.log("SignUp successful");
+      const user = await User.findOne({ email }).select("-password");
       return res
         .status(201)
-        .json({ message: "User created successfully", user, token });
+        .json({ message: "User created successfully", user });
     }
     return res.status(400).json({ message: "User already exists" });
   } catch (error) {
@@ -51,23 +60,52 @@ const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    const user = await User.findOne({ email });
-    if (!user) {
+    const UserDetails = await User.findOne({ email });
+    if (!UserDetails) {
       return res.status(400).json({ message: "User does not exist" });
     }
-    const checkPassword = await bcrypt.compare(password, user.password);
+    const checkPassword = await bcrypt.compare(password, UserDetails.password);
     if (!checkPassword) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+
+    const existingCookie = `token_${UserDetails._id}`;
+    if (req.cookies[existingCookie]) {
+      return res.status(400).json({ message: "User already logged in" });
+    }
+
+    const token = jwt.sign({ id: UserDetails._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+
+    res.cookie(`token_${UserDetails._id}`, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
+    });
+
+    const user = await User.findOne({ email }).select("-password");
+
     console.log("Login successful");
-    return res.status(200).json({ message: "Login success", user, token });
+    return res.status(200).json({ message: "Login success", user });
   } catch (error) {
     console.error("Error in login:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { signUp, login };
+const logout = (req, res) => {
+  try {
+    res.clearCookie(`token_${req.senderId}`, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+    });
+    return res.status(200).json({ message: "logout successful" });
+  } catch (error) {
+    return res.status(500).json({ message: "Invalid Cookie" });
+  }
+};
+
+module.exports = { signUp, login, logout };

@@ -9,12 +9,16 @@ const ChatContacts = ({ user }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/user/${user._id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/user/${user._id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
         const data = await response.json();
         if (data.userContacts) {
           setUserContacts(data.userContacts);

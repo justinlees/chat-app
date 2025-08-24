@@ -5,6 +5,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 const SearchContacts = ({ user, userContacts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [receiver, setReceiver] = useState();
+  const [isLoading, setIsLoading] = useState(true);
   // const [showContact, setShowContact] = useState(false);
 
   const [userPopUp, setUserPopUp] = useState(false);
@@ -17,14 +18,18 @@ const SearchContacts = ({ user, userContacts }) => {
     const fetchContacts = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/user/${user._id}?contact=${searchTerm}`,
+          `${import.meta.env.VITE_BASE_URL}/user/${
+            user._id
+          }?contact=${searchTerm}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
           }
         );
         const data = await response.json();
         if (data.receiver) {
+          setIsLoading(false);
           setReceiver(data.receiver);
         } else if (!data.receiver) {
           console.log("No contacts found");
@@ -33,7 +38,7 @@ const SearchContacts = ({ user, userContacts }) => {
         console.error("Error fetching contacts:", error);
         setReceiver();
       }
-      console.log("fetch Executed");
+      setIsLoading(false);
     };
     fetchContacts();
   }, [searchTerm, user._id]);
@@ -59,6 +64,12 @@ const SearchContacts = ({ user, userContacts }) => {
             className="border border-gray-700 rounded-xl p-2 text-white font-bold w-full bg-gray-800"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {isLoading && (
+            <div className="w-full h-full flex justify-center items-center gap-2">
+              <div className="loader1 w-full top-1/2 right-1/2 "></div>
+              <h1 className="text-white">Loading...</h1>
+            </div>
+          )}
           {receiver ? (
             <Link
               className="p-2 rounded hover:bg-gray-800 cursor-pointer filter-blur"

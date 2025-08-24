@@ -17,6 +17,7 @@ const MessageContact = () => {
   const [docFile, setDocFile] = useState(null);
   const [textMessage, setTextMessage] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { senderId, receiverId } = useParams();
 
@@ -28,16 +29,17 @@ const MessageContact = () => {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io(`${import.meta.env.VITE_BASE_URL}`);
     const fetchUserDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/user/${senderId}/${receiverId}`,
+          `${import.meta.env.VITE_BASE_URL}/user/${senderId}/${receiverId}`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include",
           }
         );
         const data = await response.json();
@@ -48,6 +50,7 @@ const MessageContact = () => {
           setReceiver(data.receiver);
         }
         if (data.messages) {
+          setIsLoading(false);
           setUserMessages(data.messages);
         } else {
           setError(data.message);
@@ -98,10 +101,11 @@ const MessageContact = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/user/${senderId}/${receiverId}`,
+        `${import.meta.env.VITE_BASE_URL}/user/${senderId}/${receiverId}`,
         {
           method: "POST",
           body: formData,
+          credentials: "include",
         }
       );
       const data = await response.json();
@@ -148,6 +152,12 @@ const MessageContact = () => {
 
       {/* Chat Container */}
       <div className="flex flex-col w-full h-full overflow-y-scroll p-2 gap-2 relative">
+        {isLoading && (
+          <div className="w-full h-full flex justify-center items-center gap-2">
+            <div className="loader w-full top-1/2 right-1/2 "></div>
+            <h1>Loading...</h1>
+          </div>
+        )}
         {userMessages?.map((msg) =>
           msg.senderId === senderId ? (
             <div className="max-w-2xl flex flex-col ml-auto p-1" key={msg._id}>

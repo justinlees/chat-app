@@ -9,7 +9,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://chat-app-rho-beige.vercel.app/"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true, limit: 15 * 1024 * 1024 }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://chat-app-rho-beige.vercel.app/"],
     methods: ["GET", "POST"],
   },
 });

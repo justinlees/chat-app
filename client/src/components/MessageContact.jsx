@@ -29,11 +29,15 @@ const MessageContact = () => {
   };
 
   useEffect(() => {
-    const socket = io(`${import.meta.env.VITE_BASE_URL}`);
+    const socket = io(
+      `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}`
+    );
     const fetchUserDetails = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/user/${senderId}/${receiverId}`,
+          `${
+            import.meta.env.VITE_BASE_URL || "http://localhost:5000"
+          }/user/${senderId}/${receiverId}`,
           {
             method: "GET",
             headers: {
@@ -101,7 +105,9 @@ const MessageContact = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/user/${senderId}/${receiverId}`,
+        `${
+          import.meta.env.VITE_BASE_URL || "http://localhost:5000"
+        }/user/${senderId}/${receiverId}`,
         {
           method: "POST",
           body: formData,

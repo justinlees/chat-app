@@ -12,7 +12,9 @@ const User = () => {
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/user/${senderId}`,
+          `${
+            import.meta.env.VITE_BASE_URL || "http://localhost:5000"
+          }/user/${senderId}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },

@@ -7,19 +7,22 @@ const SignUp = () => {
   const [mobile, setMobile] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signUp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        mobile,
-      }),
-      credentials: "include",
-    })
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/signUp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          mobile,
+        }),
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         if (data.message === "User created successfully") {

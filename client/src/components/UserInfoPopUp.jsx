@@ -10,7 +10,9 @@ const UserInfoPopUp = ({ user, isOpen, onClose }) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/user/${userDetails._id}/profile`,
+        `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/user/${
+          userDetails._id
+        }/profile`,
         {
           method: "PATCH",
           headers: {
@@ -34,14 +36,17 @@ const UserInfoPopUp = ({ user, isOpen, onClose }) => {
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ senderId: user._id }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ senderId: user._id }),
+          credentials: "include",
+        }
+      );
       const data = await response.json();
       if (data.message === "logout successful") {
         window.location.href = "/login";
@@ -60,7 +65,9 @@ const UserInfoPopUp = ({ user, isOpen, onClose }) => {
     formData.append("profileImage", e.target.profileImage.files[0]);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/user/${user._id}/profile`,
+        `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/user/${
+          user._id
+        }/profile`,
         {
           method: "PUT",
           body: formData,

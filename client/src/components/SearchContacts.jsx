@@ -18,7 +18,7 @@ const SearchContacts = ({ user, userContacts }) => {
     const fetchContacts = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/user/${
+          `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/user/${
             user._id
           }?contact=${searchTerm}`,
           {
@@ -46,7 +46,7 @@ const SearchContacts = ({ user, userContacts }) => {
   return (
     <div className="flex w-full h-full">
       {/* SideBar */}
-      <div className="flex flex-col w-1/4 min-w-60 h-full bg-gray-900">
+      <div className="flex flex-col w-1/4 h-full bg-gray-900">
         <div className="bg-gray-800 flex items-center justify-between p-4 h-14">
           <h1 className="text-xl text-white">{user.name}</h1>
           <h1

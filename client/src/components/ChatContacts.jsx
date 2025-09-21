@@ -10,7 +10,9 @@ const ChatContacts = ({ user }) => {
     const fetchContacts = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/user/${user._id}`,
+          `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/user/${
+            user._id
+          }`,
           {
             method: "GET",
             headers: {

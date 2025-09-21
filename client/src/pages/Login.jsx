@@ -4,13 +4,16 @@ const Login = () => {
   useEffect(() => {
     const checkToken = async (e) => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/login`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
         const data = await response.json();
         if (data.message === "User Token exist") {
           window.location.href = `/user/${data.user._id}`;
@@ -29,14 +32,17 @@ const Login = () => {
       email: e.target.Email.value,
       password: e.target.Password.value,
     };
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginUser),
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginUser),
+        credentials: "include",
+      }
+    );
     const data = await response.json();
     if (data.message === "Login success") {
       window.location.href = `/user/${data.user._id}`;

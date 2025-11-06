@@ -21,6 +21,7 @@ const Login = () => {
           setIsLoading(false);
           window.location.href = `/user/${data.user._id}`;
         }
+        setIsLoading(false);
       } catch (error) {
         alert("Server Error");
       }

@@ -156,14 +156,18 @@ const UserInfoPopUp = ({ user, isOpen, onClose }) => {
             </li>
           </ul>
           <form method="POST" onSubmit={handleLogout}>
-            <button type="submit" className="text-red-500 hover:text-red-900">
-              LogOut &gt;
+            <button
+              type="submit"
+              className="text-red-500 flex items-center mt-2 mb-2 cursor-pointer hover:text-red-900"
+            >
+              logout
+              <span className="material-symbols-outlined">logout</span>
             </button>
           </form>
 
           <button
             onClick={onClose}
-            className="border border-gray-400 hover:bg-blue-400 hover:text-white cursor-pointer shadow-md rounded p-2 text-center w-1/4 mt-2 transition-colors"
+            className="border border-gray-400 hover:bg-blue-400 hover:text-white cursor-pointer shadow-md rounded p-2 text-center w-1/4 mt-2 mb-2 transition-colors"
           >
             Close
           </button>

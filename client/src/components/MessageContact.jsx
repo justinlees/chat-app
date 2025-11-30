@@ -139,20 +139,20 @@ const MessageContact = () => {
   return (
     <div className="flex flex-col w-full h-full">
       {/* ReceiverBar */}
-      <div className="flex items-center justify-between h-14 p-4 bg-gray-800">
+      <div className="flex items-center justify-between border-b border-gray-300 h-14 p-4 ">
         <div className="flex items-center gap-2">
           <img
             src={receiver?.profileImage}
             className="w-12 h-12 rounded-full"
           />
-          <h1 className=" text-lg text-white">{receiver?.name}</h1>
+          <h1 className=" text-lg text-black">{receiver?.name}</h1>
         </div>
 
         <h1
-          className="text-lg text-white hover:cursor-pointer"
+          className="text-lg text-black flex item-center hover:cursor-pointer"
           onClick={handleClick}
         >
-          ...
+          <span className="material-symbols-outlined">menu</span>
         </h1>
       </div>
 
@@ -179,14 +179,20 @@ const MessageContact = () => {
                       type="application/pdf"
                       width="100%"
                       height="400px"
+                      className="bg-gray-300 p-2"
                     ></object>
                   ) : (
-                    <img src={msg.image} />
+                    <figure className="bg-gray-300 p-2 pb-4 rounded-lg ">
+                      <img
+                        src={msg.image}
+                        className="rounded-lg border border-gray-400"
+                      />
+                    </figure>
                   )
                 ) : null}
 
                 {msg.text && (
-                  <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-900 text-gray-200 rounded-2xl break-all whitespace-pre-wrap">
+                  <h1 className="flex justify-center p-2 px-4 min-w-16 text-md mr-auto bg-black text-gray-100 rounded-2xl break-all whitespace-pre-wrap">
                     {msg.text}
                   </h1>
                 )}
@@ -214,13 +220,19 @@ const MessageContact = () => {
                       type="application/pdf"
                       width="100%"
                       height="400px"
+                      className="bg-gray-300 p-2"
                     ></object>
                   ) : (
-                    <img src={msg.image} />
+                    <figure className="bg-gray-300 p-2 pb-4 rounded-lg ">
+                      <img
+                        src={msg.image}
+                        className="rounded-lg border border-gray-400"
+                      />
+                    </figure>
                   )
                 ) : null}
                 {msg.text && (
-                  <h1 className="flex justify-center p-2 px-4 text-md mr-auto bg-gray-400 text-gray-900 rounded-2xl break-all whitespace-pre-wrap">
+                  <h1 className="flex justify-center p-2 px-4 min-w-16 text-md mr-auto bg-gray-200 text-black rounded-2xl break-all whitespace-pre-wrap">
                     {msg.text}
                   </h1>
                 )}
@@ -277,7 +289,7 @@ const MessageContact = () => {
       </div>
 
       {/* Input Box */}
-      <div className="flex items-center bg-gray-100 p-3 ">
+      <div className="flex items-center bg-white p-3 ">
         <form
           method="POST"
           className="flex items-center w-full h-16 gap-3"

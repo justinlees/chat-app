@@ -46,22 +46,22 @@ const SearchContacts = ({ user, userContacts }) => {
   return (
     <div className="flex w-full h-full">
       {/* SideBar */}
-      <div className="flex flex-col w-1/4 h-full bg-gray-900">
-        <div className="bg-gray-800 flex items-center justify-between p-4 h-14">
-          <h1 className="text-xl text-white">{user.name}</h1>
+      <div className="flex flex-col w-1/4 h-full bg-white border-r border-gray-300 ">
+        <div className="bg-white-800 flex items-center justify-between p-4 h-14">
+          <h1 className="text-xl text-black">{user.name}</h1>
           <h1
-            className="text-lg text-white hover:cursor-pointer"
+            className="text-lg text-black hover:cursor-pointer flex items-center "
             onClick={handleClick}
           >
-            ...
+            <span className="material-symbols-outlined">menu</span>
           </h1>
         </div>
-        <div className="flex flex-col p-4 gap-2 text-white h-full">
+        <div className="flex flex-col p-4 gap-2 text-black h-full">
           <input
             type="search"
             name="contacts"
             placeholder="Search"
-            className="border border-gray-700 rounded-xl p-2 text-white font-bold w-full bg-gray-800"
+            className="border border-gray-700 rounded-xl p-2 text-black font-bold w-full bg-white-800"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {isLoading && (
@@ -72,7 +72,7 @@ const SearchContacts = ({ user, userContacts }) => {
           )}
           {receiver ? (
             <Link
-              className="p-2 rounded hover:bg-gray-800 cursor-pointer filter-blur"
+              className="p-2 rounded hover:bg-gray-300 cursor-pointer filter-blur"
               to={`${receiver._id}`}
             >
               {receiver.name}
@@ -87,8 +87,8 @@ const SearchContacts = ({ user, userContacts }) => {
                 key={contact._id}
                 className={({ isActive }) =>
                   isActive
-                    ? "p-2 flex hover:bg-gray-600 bg-gray-800 text-lg rounded transition-colors"
-                    : "p-2 flex hover:bg-gray-600 text-lg rounded transition-colors"
+                    ? "p-2 flex hover:bg-gray-300 bg-gray-200 text-lg rounded transition-colors"
+                    : "p-2 flex hover:bg-gray-300 text-lg rounded transition-colors"
                 }
               >
                 {contact.name}
@@ -105,7 +105,7 @@ const SearchContacts = ({ user, userContacts }) => {
         )}
       </div>
 
-      <div className="message-container flex w-full h-full bg-gray-100 relative">
+      <div className="message-container flex w-full h-full bg-white relative">
         <Outlet />
       </div>
     </div>

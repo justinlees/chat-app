@@ -64,6 +64,7 @@ const Login = () => {
     return (
       <div className="loadPage">
         <span className="mainLoader"></span>
+        <span>Checking the user cookies.....</span>
       </div>
     );
   else

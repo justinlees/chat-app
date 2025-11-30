@@ -68,12 +68,12 @@ const User = () => {
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <div className="flex items-center h-12 bg-gray-900">
+      <div className="flex items-center border-b border-gray-300 h-12 bg-white">
         <h1
-          className="text-3xl p-6 text-gray-200 font-bold text-shadow-pink-800-lg "
+          className="text-3xl p-6 text-gray-600 font-bold text-shadow-pink-800-lg "
           style={{
             fontFamily: "'Noto Sans', sans-serif",
-            textShadow: "2px 2px  #3e6483ff",
+            textShadow: "2px 2px  #e0f1ffff",
           }}
         >
           ChatMe

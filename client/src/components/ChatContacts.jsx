@@ -36,7 +36,8 @@ const ChatContacts = ({ user }) => {
   }, [user._id]);
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* This ensures full height & proper layout */}
       <SearchContacts user={user} userContacts={userContacts} />
     </div>
   );

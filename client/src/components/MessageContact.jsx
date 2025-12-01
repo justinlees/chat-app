@@ -5,14 +5,11 @@ import ReceiverInfoPopUp from "./ReceiverInfoPopUp.jsx";
 
 const MessageContact = () => {
   const [userPopUp, setUserPopUp] = useState(false);
-
   const [userMessages, setUserMessages] = useState([]);
   const [sender, setSender] = useState();
   const [receiver, setReceiver] = useState();
-
   const [info, setInfo] = useState(null);
   const [error, setError] = useState();
-
   const [docPreview, setDocPreview] = useState(null);
   const [docFile, setDocFile] = useState(null);
   const [textMessage, setTextMessage] = useState(null);
@@ -20,18 +17,12 @@ const MessageContact = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { senderId, receiverId } = useParams();
-
   const messageEnd = useRef(null);
 
-  const handleClick = () => {
-    console.log("User pop up");
-    setUserPopUp(true);
-  };
+  const handleClick = () => setUserPopUp(true);
 
   useEffect(() => {
-    const socket = io(
-      `${import.meta.env.VITE_BASE_URL || "http://localhost:5000"}`
-    );
+    const socket = io(import.meta.env.VITE_BASE_URL || "http://localhost:5000");
     const fetchUserDetails = async () => {
       try {
         const response = await fetch(
@@ -40,28 +31,20 @@ const MessageContact = () => {
           }/user/${senderId}/${receiverId}`,
           {
             method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             credentials: "include",
           }
         );
         const data = await response.json();
-        if (data.sender) {
-          setSender(data.sender);
-        }
-        if (data.receiver) {
-          setReceiver(data.receiver);
-        }
+        if (data.sender) setSender(data.sender);
+        if (data.receiver) setReceiver(data.receiver);
         if (data.messages) {
-          setIsLoading(false);
           setUserMessages(data.messages);
-        } else {
-          setError(data.message);
-        }
+          setIsLoading(false);
+        } else setError(data.message);
       } catch (error) {
-        console.error("Error fetching user details:", error);
-        setError("Unable to fetch user details");
+        console.error("Error:", error);
+        setError("Unable to fetch chat");
       }
     };
     fetchUserDetails();
@@ -70,16 +53,12 @@ const MessageContact = () => {
       senderId < receiverId
         ? `${senderId}-${receiverId}`
         : `${receiverId}-${senderId}`;
-
     socket.emit("join", roomId);
-
     socket.on("receiveMessage", (messageData) => {
       setUserMessages((prev) => [...prev, messageData]);
     });
 
-    return () => {
-      socket.off("receiveMessage"); // Clean up listener
-    };
+    return () => socket.off("receiveMessage");
   }, [senderId, receiverId]);
 
   useEffect(() => {
@@ -88,257 +67,252 @@ const MessageContact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!textMessage && !docFile) return;
     setIsSending(true);
-
-    const messageData = {
-      senderId: senderId,
-      receiverId: receiverId,
-      text: textMessage,
-      image: docFile,
-    };
 
     const formData = new FormData();
     formData.append("senderId", senderId);
     formData.append("receiverId", receiverId);
-    formData.append("text", messageData.text);
-    formData.append("image", messageData.image);
+    formData.append("text", textMessage || "");
+    if (docFile) formData.append("image", docFile);
 
     try {
       const response = await fetch(
         `${
           import.meta.env.VITE_BASE_URL || "http://localhost:5000"
         }/user/${senderId}/${receiverId}`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
+        { method: "POST", body: formData, credentials: "include" }
       );
       const data = await response.json();
       if (data.message === "Message sent successfully") {
         setDocFile(null);
         setDocPreview(null);
-        setTextMessage(null);
-        setIsSending(false);
+        setTextMessage("");
         e.target.reset();
       }
-      messageEnd.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
-      console.error("Error sending message:", error);
-      alert(`Failed to send message ${error}`);
+      console.error("Send error:", error);
+      alert("Failed to send message");
+    } finally {
       setIsSending(false);
     }
   };
 
   if (error) {
     return (
-      <div className="text-3xl flex justify-center items-center">{error}</div>
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <p className="text-xl text-red-400 font-medium">{error}</p>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full h-full">
-      {/* ReceiverBar */}
-      <div className="flex items-center justify-between border-b border-gray-300 h-14 p-4 ">
-        <div className="flex items-center gap-2">
-          <img
-            src={receiver?.profileImage}
-            className="w-12 h-12 rounded-full"
-          />
-          <h1 className=" text-lg text-black">{receiver?.name}</h1>
+    <div className="flex flex-col h-full bg-gradient-to-br from-gray-900 via-purple-900/30 to-slate-900">
+      {/* Chat Header */}
+      <header className="bg-black/40 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between shadow-xl">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <img
+              src={receiver?.profileImage || "/default-avatar.png"}
+              alt={receiver?.name}
+              className="w-12 h-12 rounded-full ring-4 ring-purple-500/50 shadow-lg object-cover"
+            />
+            <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-pulse"></span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">
+              {receiver?.name || "Loading..."}
+            </h2>
+            <p className="text-sm text-gray-300">Active now</p>
+          </div>
         </div>
-
-        <h1
-          className="text-lg text-black flex item-center hover:cursor-pointer"
+        <button
           onClick={handleClick}
+          className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition"
         >
-          <span className="material-symbols-outlined">menu</span>
-        </h1>
-      </div>
+          <span className="material-symbols-outlined text-2xl">menu</span>
+        </button>
+      </header>
 
-      {/* Chat Container */}
-      <div className="flex flex-col w-full h-full overflow-y-scroll p-2 gap-2 relative">
-        {isLoading && (
-          <div className="w-full h-full flex justify-center items-center gap-2">
-            <div className="loader w-full top-1/2 right-1/2 "></div>
-            <h1>Loading...</h1>
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 p-6 space-y-6">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        )}
-        {userMessages?.map((msg) =>
-          msg.senderId === senderId ? (
-            <div className="max-w-2xl flex flex-col ml-auto p-1" key={msg._id}>
+        ) : (
+          userMessages.map((msg) => (
+            <div
+              key={msg._id}
+              className={`flex items-end gap-3 ${
+                msg.senderId === senderId ? "flex-row-reverse" : ""
+              }`}
+            >
               <img
-                src={sender.profileImage}
-                className="w-10 h-10 object-cover rounded-full ml-auto"
+                src={
+                  msg.senderId === senderId
+                    ? sender?.profileImage
+                    : receiver?.profileImage
+                }
+                alt=""
+                className="w-9 h-9 rounded-full shadow-md"
               />
-              <div className="max-w-2xl flex flex-col ml-auto p-1">
-                {msg.image ? (
-                  msg.image.includes(".pdf") ? (
-                    <object
-                      data={msg.image}
-                      type="application/pdf"
-                      width="100%"
-                      height="400px"
-                      className="bg-gray-300 p-2"
-                    ></object>
-                  ) : (
-                    <figure className="bg-gray-300 p-2 pb-4 rounded-lg ">
-                      <img
-                        src={msg.image}
-                        className="rounded-lg border border-gray-400"
-                      />
-                    </figure>
-                  )
-                ) : null}
 
-                {msg.text && (
-                  <h1 className="flex justify-center p-2 px-4 min-w-16 text-md mr-auto bg-black text-gray-100 rounded-2xl break-all whitespace-pre-wrap">
-                    {msg.text}
-                  </h1>
-                )}
-
-                <span className="text-xs text-gray-900 ml-auto">
-                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-2xl flex flex-col mr-auto p-1" key={msg._id}>
-              <img
-                src={receiver.profileImage}
-                className="w-10 h-10 object-cover rounded-full"
-              />
-              <div className="max-w-2xl flex flex-col mr-auto p-1">
-                {msg.image ? (
-                  msg.image.includes(".pdf") ? (
-                    <object
-                      data={msg.image}
-                      type="application/pdf"
-                      width="100%"
-                      height="400px"
-                      className="bg-gray-300 p-2"
-                    ></object>
-                  ) : (
-                    <figure className="bg-gray-300 p-2 pb-4 rounded-lg ">
-                      <img
-                        src={msg.image}
-                        className="rounded-lg border border-gray-400"
-                      />
-                    </figure>
-                  )
-                ) : null}
-                {msg.text && (
-                  <h1 className="flex justify-center p-2 px-4 min-w-16 text-md mr-auto bg-gray-200 text-black rounded-2xl break-all whitespace-pre-wrap">
-                    {msg.text}
-                  </h1>
-                )}
-
-                <span className="text-xs text-gray-900 mr-auto">
-                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
-                </span>
-              </div>
-            </div>
-          )
-        )}
-        {isSending && (
-          <div className="loader w-full h-full top-1/2 right-1/2"></div>
-        )}
-        {docPreview && (
-          <div className="fixed top-1/2 right-10 transform -translate-y-1/2 bg-white shadow-lg border border-gray-300 rounded-lg w-80 z-50">
-            <div className="flex justify-between items-center p-2 border-b border-gray-200">
-              <span className="text-sm font-medium text-gray-700">
-                Image Preview
-              </span>
-              <button
-                onClick={() => {
-                  setDocFile(null);
-                  setDocPreview(null);
-                }}
-                className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-red-500 transition"
+              <div
+                className={`flex flex-col ${
+                  msg.senderId === senderId ? "items-end" : "items-start"
+                } max-w-lg`}
               >
-                ✕
-              </button>
-            </div>
-            <div className="p-2">
-              {docPreview.endsWith(".pdf") ? (
-                <object
-                  data={docPreview}
-                  type="application/pdf"
-                  alt="Preview"
-                  className="w-full h-auto rounded-md object-contain"
-                />
-              ) : (
-                <img
-                  src={docPreview}
-                  className="w-full h-auto rounded-md object-contain"
-                />
-              )}
-            </div>
-          </div>
-        )}
+                {msg.image && (
+                  <div
+                    className={`rounded-2xl overflow-hidden shadow-xl mb-1 ${
+                      msg.senderId === senderId
+                        ? "bg-gradient-to-br from-purple-600 to-pink-600 p-1"
+                        : "bg-gray-700 p-1"
+                    }`}
+                  >
+                    {msg.image.includes(".pdf") ? (
+                      <div className="bg-white/10 backdrop-blur p-4 rounded-xl">
+                        <object
+                          data={msg.image}
+                          type="application/pdf"
+                          width="100%"
+                          height="400px"
+                          className="bg-gray-300 p-2"
+                        ></object>
+                      </div>
+                    ) : (
+                      <img
+                        src={msg.image}
+                        alt="sent"
+                        className="max-w-xs rounded-xl"
+                      />
+                    )}
+                  </div>
+                )}
 
+                {msg.text && (
+                  <div
+                    className={`px-5 py-3 rounded-3xl shadow-lg max-w-md break-words ${
+                      msg.senderId === senderId
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                        : "bg-white/10 backdrop-blur text-white border border-white/20"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                )}
+
+                <span className="text-xs text-gray-400 mt-1 px-2">
+                  {new Date(msg.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
         <div ref={messageEnd} />
       </div>
 
-      {/* Input Box */}
-      <div className="flex items-center bg-white p-3 ">
-        <form
-          method="POST"
-          className="flex items-center w-full h-16 gap-3"
-          onSubmit={handleSubmit}
-          encType="multipart/form-data"
-        >
-          {/* File Upload Button */}
-          <label
-            htmlFor="fileInput"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-600 cursor-pointer hover:bg-gray-300 transition"
-          >
-            +
+      {/* Image / PDF Preview – now a floating card (not full-screen) */}
+      {docPreview && (
+        <div className="fixed inset-0 z-40 flex items-end justify-center pb-24 px-4 pointer-events-none">
+          {/* pointer-events-none on overlay so clicks go through to the input bar */}
+          <div className="relative max-w-lg w-full pointer-events-auto animate-in slide-in-from-bottom duration-300">
+            {/* Card */}
+            <div className="bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+              {/* Header with close button */}
+              <div className="flex items-center justify-between p-3 border-b border-white/10">
+                <p className="text-sm font-medium text-gray-300">Preview</p>
+                <button
+                  onClick={() => {
+                    setDocFile(null);
+                    setDocPreview(null);
+                  }}
+                  className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition"
+                >
+                  <span className="material-symbols-outlined text-xl">
+                    close
+                  </span>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="max-h-96 overflow-auto">
+                {docPreview.endsWith(".pdf") ? (
+                  <object
+                    data={docPreview}
+                    type="application/pdf"
+                    className="w-full h-96 bg-gray-800"
+                  />
+                ) : (
+                  <img
+                    src={docPreview}
+                    alt="Preview"
+                    className="w-full h-auto max-h-96 object-contain"
+                  />
+                )}
+              </div>
+
+              {/* Footer hint */}
+              <div className="p-3 text-center text-xs text-gray-400 border-t border-white/10">
+                Tap Send to share • You can still type or add text
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Input Bar */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-black/40 backdrop-blur-xl border-t border-white/10 p-4"
+      >
+        <div className="flex items-center gap-3 max-w-4xl mx-auto">
+          <label className="cursor-pointer text-gray-300 hover:text-white transition">
+            <span className="material-symbols-outlined text-3xl">
+              attach_file
+            </span>
             <input
               type="file"
               name="image"
-              id="fileInput"
               className="hidden"
+              accept="image/*,.pdf"
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
                   setDocFile(file);
                   setDocPreview(URL.createObjectURL(file));
                 }
-                e.target.value = "";
               }}
             />
           </label>
 
-          {/* Message Input */}
           <input
             type="text"
             placeholder="Type a message..."
-            name="text"
-            className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white shadow-sm"
-            onChange={(e) => {
-              setTextMessage(e.target.value);
-            }}
+            value={textMessage || ""}
+            onChange={(e) => setTextMessage(e.target.value)}
+            className="flex-1 bg-white/10 backdrop-blur border border-white/20 rounded-full px-6 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
 
-          {/* Send Button */}
           <button
-            type={textMessage || docFile !== null ? "submit" : "button"}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
+            type="submit"
+            disabled={isSending || (!textMessage && !docFile)}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition transform hover:scale-110 disabled:scale-100"
           >
-            ➤
+            {isSending ? (
+              <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+            ) : (
+              <span className="material-symbols-outlined">send</span>
+            )}
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
 
+      {/* Receiver Info Popup */}
       {userPopUp && (
         <ReceiverInfoPopUp
           userDetails={receiver}

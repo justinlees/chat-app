@@ -1,0 +1,12 @@
+config:
+  target: "https://chat-app-4mzz.onrender.com" # Replace with your local or deployed API URL
+  phases:
+    - duration: 60 # Run this phase for 60 seconds
+      arrivalRate: 10 # Create 10 new virtual users every second
+      name: "Sustained Load"
+
+scenarios:
+  - name: "Fetch user data"
+    flow:
+      - get:
+          url: "/api/users" # The specific route to hit
